@@ -6,6 +6,8 @@ import bmadminhome from '@/view/admin/home/bmadminhome'
 import bmbasedata from '@/view/admin/home/basedata/bmbasedata'
 import bmwechatconfig from '@/view/admin/home/wechatconfig/bmwechatconfig'
 import AdminBody from '@/view/admin/AdminBody'
+import htRouter from './htRouter'
+import {isWeiXin} from '@/utils/request'
 
 Vue.use(Router)
 
@@ -37,103 +39,7 @@ const router = new Router({
       name: '登陆',
       component: resolve => (require(["@/view/admin/login"], resolve))
     },
-    {
-      path: '/',
-      // name: 'admin',
-      component: resolve => (require(["@/view/admin/AdminBody"], resolve)),
-      redirect: '/home',
-      children: [{
-        name: '首页',
-        path: 'home',
-        component: resolve => (require(["@/components/AdminBody/Home"], resolve))
-      }, {
-        name: '用户管理',
-        path: 'user',
-        component: resolve => (require(["@/components/AdminBody/UserControl/User"], resolve)),
-        children: [{
-          name: '用户列表',
-          path: 'list',
-          component: resolve => (require(["@/components/AdminBody/UserControl/UserList"], resolve))
-        }, {
-          name: '新增用户',
-          path: 'add',
-          component: resolve => (require(["@/components/AdminBody/UserControl/UserAdd"], resolve))
-        }]
-      }, {
-        name: '菜单管理',
-        path: 'menu',
-        component: resolve => (require(["@/components/AdminBody/MenuControl/Menu"], resolve)),
-        children: [{
-          name: '菜单列表',
-          path: 'menulist',
-          component: resolve => (require(["@/components/AdminBody/MenuControl/MenuList"], resolve))
-        }, {
-          name: '角色列表',
-          path: 'rolelist',
-          component: resolve => (require(["@/components/AdminBody/MenuControl/RoleList"], resolve))
-        }, {
-          name: '角色菜单',
-          path: 'rolemenu',
-          component: resolve => (require(["@/components/AdminBody/MenuControl/RoleMenu"], resolve))
-        }]
-      }, {
-        name: '楼宇查询',
-        path: 'querybuilding',
-        component: resolve => (require(["@/components/AdminBody/QueryBuilding"], resolve))
-      }, {
-        name: '医院详情',
-        path: 'hospitaldetail',
-        component: resolve => (require(["@/components/AdminBody/HospitalDetail"], resolve))
-      }, {
-        name: '挂号类别',
-        path: 'maintain',
-        component: resolve => (require(["@/components/AdminBody/Maintain"], resolve))
-      }, {
-        name: '根据楼宇楼层查询',
-        path: '/findbybuildingidandfloor',
-        component: resolve => (require(["@/components/AdminBody/FindByBuildingIdAndFloor"], resolve))
-      }, {
-        name: '根据身体部位编码查询',
-        path: '/querydepbypartcode',
-        component: resolve => (require(["@/components/AdminBody/QueryDepByPartCode"], resolve))
-      }, {
-        name: '科室查询',
-        path: '/querydeppage',
-        component: resolve => (require(["@/components/AdminBody/QueryDepPage"], resolve))
-      }, {
-        name: '查询科室住院宣教',
-        path: '/querydepedu',
-        component: resolve => (require(["@/components/AdminBody/QueryDepEdu"], resolve))
-      }, {
-        name: '根据挂号排班查询医生信息',
-        path: '/queryscheduledoctorlist',
-        component: resolve => (require(["@/components/AdminBody/DoctorService/QueryScheduleDoctorList"], resolve))
-      }, {
-        name: '根据专家标识和科室查询医生信息',
-        path: '/querydoctorlist',
-        component: resolve => (require(["@/components/AdminBody/DoctorService/QueryDoctorList"], resolve))
-      }, {
-        name: '就诊人信息',
-        path: 'patientinfo',
-        component: resolve => (require(["@/components/AdminBody/PatientInfo"], resolve))
-      }, {
-        name: '科室人员排班',
-        path: '/scheduling',
-        component: resolve => (require(["@/components/AdminBody/Scheduling"], resolve))
-      }, {
-        name: '文章发布',
-        path: '/queryhealthforum',
-        component: resolve => (require(["@/components/AdminBody/HealthForumService/QueryHealthForum"], resolve))
-      }, {
-        name: '在线挂号列表',
-        path: '/queryonlinelist',
-        component: resolve => (require(["@/components/AdminBody/RegisterScheduleService/QueryOnlineList"], resolve))
-      }, {
-        name: '查询排班信息',
-        path: '/queryregistershedulelist',
-        component: resolve => (require(["@/components/AdminBody/RegisterScheduleService/QueryRegisterSheduleList"], resolve))
-      }]
-    },
+    htRouter,
     {
       path: '/bmadminhome',
       name: 'bmadminhome',
@@ -370,11 +276,27 @@ const router = new Router({
           active:"wxpersoncenter"
         }
       },{
+        path: '/wxmypaybillsdetail',
+        name: 'wxmypaybillsdetail',
+        component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxmypaybillsdetail"],resolve)),
+        meta:{
+          title:"账单详情",
+          active:"wxpersoncenter"
+        }
+      },{
         path: '/wxpaymentinfos',
         name: 'wxpaymentinfos',
         component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxpaymentinfos"],resolve)),
         meta:{
           title:"交易记录",
+          active:"wxpersoncenter"
+        }
+      },{
+        path: '/wxpaymentdetail',
+        name: 'wxpaymentdetail',
+        component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxpaymentdetail"],resolve)),
+        meta:{
+          title:"交易详情",
           active:"wxpersoncenter"
         }
       },{
@@ -401,16 +323,73 @@ const router = new Router({
           title:"体检报告",
           active:"wxpersoncenter"
         }
+      },{
+        path: '/wxregisterdetail',
+        name: 'wxregisterdetail',
+        component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxregisterdetail"],resolve)),
+        meta:{
+          title:"就诊详情",
+          active:"wxpersoncenter"
+        }
+      },{
+        path: '/wxadvicedetail',
+        name: 'wxadvicedetail',
+        component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxadvicedetail"],resolve)),
+        meta:{
+          title:"医嘱详情",
+          active:"wxpersoncenter"
+        }
+      },{
+        path: '/wxlisreportdetail',
+        name: 'wxlisreportdetail',
+        component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxlisreportdetail"],resolve)),
+        meta:{
+          title:"检验报告详情",
+          active:"wxpersoncenter"
+        }
+      },{
+        path: '/wxrisreportdetail',
+        name: 'wxrisreportdetail',
+        component: resolve=>(require(["@/view/wechart/personcenter/toolspage/wxrisreportdetail"],resolve)),
+        meta:{
+          title:"检查报告详情",
+          active:"wxpersoncenter"
+        }
       }
+
+      
       
     ]
+    },{
+      path: '/applogin',
+      name: 'applogin',
+      component: resolve => (require(["@/view/wechart/appauthor/applogin/applogin"], resolve)),
+      meta:{
+        title:"互联网平台"
+      }
+    },{
+      path: '/appregister',
+      name: 'appregister',
+      component: resolve => (require(["@/view/wechart/appauthor/appregister/appregister"], resolve)),
+      meta:{
+        title:"互联网平台"
+      }
+    },{
+      path: '/appfindpassword',
+      name: 'appfindpassword',
+      component: resolve => (require(["@/view/wechart/appauthor/appfindpassword/appfindpassword"], resolve)),
+      meta:{
+        title:"互联网平台"
+      }
     }
   ]
 })
 // 设置导航守卫
 router.beforeEach((to, from, next) => {
-    console.log("to:" + to.path);
-    console.log("from:" + from.path);
+  
+    const toPath = to.path;
+    // console.log("to:" + to.path);
+    // console.log("from:" + from.path);
     // console.log("next:" + next);
     if (to.meta.title) { // 设置路由页面标题
       document.title = to.meta.title
@@ -421,23 +400,48 @@ router.beforeEach((to, from, next) => {
     if (to.matched.length === 0) { //匹配前往的路由不存在
       next('/notpage')
     }else{
-      
+      console.log(store.state.userinfo.id)
       if (store.state.userinfo.id) {
         next()
       } else {
         let type = to.name.substring(0,2)
-
-        if(type === 'bm'){
+        if(type === 'ht'){
           //进入后台管理登陆状态拦截
-          next()
+          const token = localStorage.getItem('token')
+          if (token) {
+            const isMenu = JSON.parse(sessionStorage.getItem('isMenu'));
+            if (isMenu && to.path !== '/home') {
+              if (!isMenu[toPath]) {
+                next('/notpage');
+                return false;
+              }
+            }
+            next()
+          } else {
+            next('/login')
+          }
         }else if(type == 'wx'){
-          //进入微信页面登陆状态拦截
-          WxAuthorize(to.path).then(data => {  //跳转微信授权页面
-            window.location.href = data
-          }).catch(error => {
-            console.error(error)
-            next(false)
-          })
+          //进入app应用页面登陆状态拦截
+          if(isWeiXin()){ //进入微信授权验证
+            WxAuthorize(to.path).then(data => {  //跳转微信授权页面
+              window.location.href = data
+            }).catch(error => {
+              console.error(error)
+              next(false)
+            })
+          }else{ //进入app登陆页面
+            const userinfo = JSON.parse(localStorage.getItem('userinfo'))
+            if(userinfo){
+              store.commit('SAVE_USER', userinfo)
+              // store.state.hospitalname = userinfo.hospitalname
+              // store.state.patient = userinfo.patient
+              next()
+            }else{
+              next('/applogin')
+            }
+            
+          }
+          
         }else{
           next()
         }

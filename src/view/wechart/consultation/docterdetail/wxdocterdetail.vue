@@ -92,6 +92,10 @@ import {cardBalance} from '@/api/card'
 import {saveAttention,cancelAttention} from '@/api/attention'
 import {queryRegisterSheduleList} from '@/api/schedule'
 import {saveRegister} from '@/api/mzservice'
+import {jsSDK} from '@/api/wxjspay'
+import { parseTime } from '@/utils/parsetime'
+import {isWeiXin} from '@/utils/request'
+
 
 import store from '@/store/index'
 
@@ -121,8 +125,14 @@ export default {
   methods:{
     //挂号提交
     registerCheck(){
-      this.loading = true
       let paytype = this.$refs.payment.isYktPay ? 2 : 1
+      if(paytype === 1 & !isWeiXin()){
+        this.$message.error('暂不支持在线支付!');
+        return
+      }
+      this.loading = true
+      
+
 
       saveRegister(store.state.userinfo.id,store.state.patient.id,this.doctodaysheduleinfo.id,paytype,1).then((data) => {  //结算
         if(paytype === 1){
@@ -150,7 +160,7 @@ export default {
         }
         this.dialogVisible = false
         this.loading = false
-        this.loadingdata()
+        this.initData()
 
       }).catch(error => {
         this.loading = false
@@ -188,7 +198,7 @@ export default {
     initData(){
       queryDoctorDetail(this.$route.query.docterid,store.state.userinfo.id).then((data) => {  //加载医师信息
         this.docinfo = data
-        queryRegisterSheduleList('',this.docinfo.id,new Date()).then((data) => {  //查询排班
+        queryRegisterSheduleList('',this.docinfo.id,parseTime(new Date(),'{y}-{m}-{d}')).then((data) => {  //查询排班
           if(data.list.length>0){
             this.doctodaysheduleinfo = data.list[0]
           }else{

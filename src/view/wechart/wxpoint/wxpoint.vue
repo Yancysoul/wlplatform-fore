@@ -1,11 +1,11 @@
 <template>
   <el-container>
+    <div style="margin-bottom:60px;">
+      <pageback v-if="showpageback"  :name='$route.meta.title' :isback='isback()'/>
+    </div>
+    
   <el-main>
-    <!-- <keep-alive>
-      <router-view v-if="$route.meta.keepAlive == undefined ? false : $route.meta.keepAlive"/>
-    </keep-alive>
-    <router-view v-if="$route.meta.keepAlive == undefined ? true : !$route.meta.keepAlive"/> -->
-    <keep-alive include="wxconsultation">
+    <keep-alive include="wxconsultation,wxservices,wxregisterinfos">
       <router-view />
     </keep-alive>
     
@@ -29,16 +29,25 @@
 </el-container>
 </template>
 <script>
-
+import pageback from '@/components/pageback'
 import store from '@/store/index'
+import {isWeiXin} from '@/utils/request'
 
 export default {
     data(){
       return{
         showfooter:true,
         oriheight:'',
-        showheight:''
+        showheight:'',
+        showpageback:!isWeiXin(),
+        isback:()=>{
+          const name = this.$route.name
+          return name!=='wxconsultation' && name!=='wxservices' && name!=='wxpersoncenter'
+        }
       }
+    },
+    components:{
+      pageback
     },
     methods:{
       test(height){
@@ -46,6 +55,8 @@ export default {
       }
     },
     mounted(){
+      console.log("route:")
+      console.log(this.$route)
       this.oriheight = `${document.documentElement.clientHeight}`;  //原始屏幕高度
       let _this = this;
       window.onresize = function temp() {

@@ -67,7 +67,7 @@
     </el-table>
     <Page :pagination="pagination"></Page>
     <menu-dialog ref="mychild" :editDialog="editDialog"></menu-dialog>
-    <menu-add :addDialog="addDialog" :pagination="pagination"></menu-add>
+    <menu-add :addDialog="addDialog" :pagination="pagination" ref="myAddChild"></menu-add>
   </section>
 </template>
 
@@ -109,19 +109,32 @@ export default {
       this.listInfo.currentPage = curPage || '';
       this.listInfo.pageSize = pageSize || '';
       this.loading = true;
-      console.log(this.listInfo)
+      // console.log(this.listInfo)
       this.axios.post("/adminUserService/queryMenuPage", this.listInfo, {}).then(res => {
         if (res) {
           const list_res = res.data.data;
-          console.log(res)
           if (list_res.code === 200) {
             this.pagination = list_res.data.pagination;
-            // console.log(list_res.data.list)
             this.lists = list_res.data.list;
             this.loading = false;
           }
         }
       })
+    },
+    // 根据ID查找菜单
+    queryMenuById (menuId) {
+      let parentMenu = '';
+      if (menuId !== '0') {
+        this.axios.post("/adminUserService/queryMenuPage", {menuId}, {}).then(res => {
+          console.log(res.data.data.data.list[0].menuName)
+          parentMenu = res.data.data.data.list[0].menuName;
+      return parentMenu;
+        })
+      } else {
+        console.log("根菜单")
+        parentMenu = "根菜单"
+      return parentMenu;
+      }
     },
     // 删除菜单
     delMenu (index, row) {
@@ -154,6 +167,7 @@ export default {
     // 添加新菜单
     addMenu () {
       this.addDialog = true;
+      this.$refs.myAddChild.getMenuLists();
     },
     // 根据页数查询
     queryListByPage (curPage) {

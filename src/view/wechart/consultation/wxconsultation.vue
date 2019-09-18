@@ -1,4 +1,4 @@
-<template>
+<template v-loading.fullscreen.lock="fullscreenLoading">
   <div>
     <search/>
     <hospitalcard/>

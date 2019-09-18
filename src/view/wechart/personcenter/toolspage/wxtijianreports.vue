@@ -1,9 +1,14 @@
 <template>
-  <h1>体检报告</h1>
 </template>
 <script>
 export default {
-  
+   mounted(){
+    this.$message({
+      message: '功能暂未开放',
+      type: 'warning'
+    });
+    this.$router.push({ path: '/wxpersoncenter' });//跳转到该路由
+  }
 }
 </script>
 <style scoped>

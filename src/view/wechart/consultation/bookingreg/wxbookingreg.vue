@@ -8,9 +8,8 @@
       <span style="font-size:12px;color:#888D97;">暂无排班~</span>
     </div>
     <div v-else>
-      <h1>{{sheduleinfos.length}}</h1>
       <ul>
-        <li v-for="item in sheduleinfos" :key="item.id">
+        <li v-for="item in sheduleinfos"  :key="item.id">
           <bookingtab :bookingdata='item'/>
         </li>
       </ul>
@@ -47,16 +46,16 @@ export default {
       })
       queryRegisterSheduleList('',this.$route.query.docterid,'').then((data) => {  //查询排班
         // this.sheduleinfos = data.list
-        let dindex = undefined
+        let newdata = []
         data.list.forEach((element,index) => {
-          if(new Date(element.scheduleDate).getYear() == new Date().getYear() &&
-          new Date(element.scheduleDate).getMonth() == new Date().getMonth() &&
-          new Date(element.scheduleDate).getDay() == new Date().getDay()){
-            dindex = index
+          console.log(element)
+          if(Math.ceil((new Date(element.scheduleDate)-new Date()) / (24 * 3600 * 1000)) > 0){
+            newdata.push(element)
           }
         });
-        data.list.splice(dindex,1)
-        this.sheduleinfos = data.list
+        
+        
+        this.sheduleinfos = newdata
       }).catch(error => {
         console.error(error)
       })

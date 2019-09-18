@@ -3,10 +3,10 @@
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true">
 				<el-form-item label="角色编号">
-					<el-input placeholder="请输入角色编号" v-model="listInfo.menuId"></el-input>
+					<el-input placeholder="请输入角色编号" v-model="listInfo.roleId"></el-input>
 				</el-form-item>
         <el-form-item label="角色名称">
-					<el-input placeholder="请输入角色名称" v-model="listInfo.menuName"></el-input>
+					<el-input placeholder="请输入角色名称" v-model="listInfo.roleName"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="queryList(curPage)">查询</el-button>
@@ -24,12 +24,12 @@
 			</el-table-column>
       <el-table-column
         prop="roleId"
-        label="	菜单编号"
+        label="	角色编号"
         min-width="180">
       </el-table-column>
       <el-table-column
         prop="roleName"
-        label="菜单名称"
+        label="角色名称"
         min-width="100">
       </el-table-column>
       <el-table-column
@@ -86,7 +86,6 @@ export default {
       this.listInfo.pageSize = pageSize || '';
       this.axios.post("/adminUserService/queryRolePage", this.listInfo, {}).then(res => {
         if (res && res.data.data.code === 200) {
-          console.log(res)
           this.roleLists = res.data.data.data.list;
           this.pagination = res.data.data.data.pagination;
           this.loading = false;

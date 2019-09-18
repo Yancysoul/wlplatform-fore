@@ -5,7 +5,7 @@
           </el-col>
           
           <el-col :span="18">
-            <div><span class="name">{{doc.name}}</span> <span class="small grade">&nbsp;&nbsp;{{doc.professionalTitle}}</span></div>
+            <div><span class="name">{{doc.name}}</span> <span class="small grade">&nbsp;&nbsp;{{doc.professionalTitle}}</span><span style="float:right;color:#5CC2AF;font-size:12px;">{{doc.remainNumber? '剩余号数:'+doc.remainNumber : ''}}</span></div>
             <div><span class="small group">{{doc.departmentName}}</span><span class="small school">&nbsp;&nbsp;{{doc.docschool}}</span></div>
             <div><span class="small introd">{{doc.speciality}}</span></div>
           </el-col>

@@ -24,36 +24,44 @@ export default {
     data() {
       return {
         toolrows:[{
-          tools:[{
-            name:'就诊记录',
-            icon:require('@/assets/image/zyxj.png'),
-            routepath:'/wxregisterinfos'
-          },{
+          tools:[
+          {
             name:'电子一卡通',
             icon:require('@/assets/image/dianzhiyiketong.png'),
             routepath:'/wxpatientcard'
-          },{
-            name:'交易记录',
-            icon:require('@/assets/image/wodezhangdan.png'),
-            routepath:'/wxmypaybillsinfos'
-          }]
-        },
-        {
-          tools:[{
-            name:'检验结果',
-            icon:require('@/assets/image/jianyanjieguo.png'),
-            routepath:'/wxlisreports'
-          },{
-            name:'检查结果',
-            icon:require('@/assets/image/jianchajieguo.png'),
-            routepath:'/wxrisreports'
+          },
+          {
+            name:'就诊记录',
+            icon:require('@/assets/image/zyxj.png'),
+            routepath:'/wxregisterinfos'
           },{
             name:'医嘱信息',
             icon:require('@/assets/image/yizhuxinxi.png'),
             routepath:'/wxadviceinfos'
           }]
         },{
-          tools:[{
+          tools:[
+          {
+            name:'我的账单',
+            icon:require('@/assets/image/wodezhangdan.png'),
+            routepath:'/wxmypaybillsinfos'
+          },{
+            name:'交易记录',
+            icon:require('@/assets/image/jiaoyijilu.png'),
+            routepath:'/wxpaymentinfos'
+          },{
+            name:'检验报告',
+            icon:require('@/assets/image/jianyanjieguo.png'),
+            routepath:'/wxlisreports'
+          }]
+        },
+        {
+          tools:[
+          {
+            name:'检查报告',
+            icon:require('@/assets/image/jianchajieguo.png'),
+            routepath:'/wxrisreports'
+          },{
             name:'体检报告',
             icon:require('@/assets/image/tijianbaogao.png'),
             routepath:'/wxtijianreports'

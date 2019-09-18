@@ -1,32 +1,12 @@
 <template>
   <section>
-    <el-table
-      :data="Buildings"
-      style="width: 100%"
-      max-height="750">
-      <el-table-column
-        prop="id"
-        label="楼宇id"
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="楼宇名称"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        label="楼宇图片"
-        min-width="250">
-        <template slot-scope="scope">
-          <span :class="scope.row.icon"></span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="150">
-				<template slot-scope="scope">
-					<el-button size="small" type="success" @click="showDetails(scope.$index, scope.row)">查看详情</el-button>
-				</template>
-			</el-table-column>
-    </el-table>
+    <el-row :gutter="10" class="building_row">
+      <el-col class='building_col' v-for="building in Buildings" :key="building.id">
+        <span :class="building.icon"></span>
+        <div class="building_name">{{building.name}}</div>
+        <div class="building_detail"><el-button size="small" type="success" @click="showDetails(building.id)">查看详情</el-button></div>
+      </el-col>
+    </el-row>
     <!--详情/编辑界面-->
 		<el-dialog
       :title="title"
@@ -75,6 +55,7 @@
 export default {
   data () {
     return {
+      loading: false,
       title: '楼宇详情',
       Buildings: [],
       dialogVisible: false, //编辑界面是否显示
@@ -113,24 +94,25 @@ export default {
     }
   },
   created () {
-    this.axios.post('/buildingService/queryBuildingList', {
-      headers: {
-        'Content-type': 'application/json'
-      }
-    }).then((res) => {
-      this.Buildings = res.data.data.data
-    })
+    this.findBuildingList ();
   },
   methods: {
-    showDetails(index, row) {
-      // console.log(index, row)
+    // 楼宇列表查询
+    findBuildingList () {
+      this.loading = true;
+      this.axios.post('/buildingService/findBuildingList', {}).then((res) => {
+        if (res && res.data.data.code === 200) {
+          this.Buildings = res.data.data.data
+          this.loading = false;
+        }
+      })
+    },
+    showDetails(id) {
       this.disabled = true;
       this.dialogVisible = true;
       this.operate = "编辑"
-      this.Building = row.id;
       this.editFlag = true;
-      const id = row.id;
-      this.axios.post("/buildingService/queryBuildingDetail", {
+      this.axios.post("/buildingService/findBuildingDetail", {
         id
       }, {
         headers: {
@@ -188,5 +170,40 @@ export default {
 }
 </script>
 
-<style>
+<style scoped lang="scss">
+.building_row {
+  display: flex;
+  flex-wrap: wrap;
+  .building_col {
+    text-align: center;
+    width: 110px;
+    margin: 10px 20px;
+    position: relative;
+    &:hover .building_detail {
+      opacity: 1;
+    }
+    span {
+      font-size: 100px;
+    }
+    .building_name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .building_detail {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      border-radius: 10px;
+      background-color: rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+  }
+}
 </style>

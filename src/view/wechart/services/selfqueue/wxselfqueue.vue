@@ -20,7 +20,7 @@
 
         <el-row>
           <el-col :span="18">
-            <el-select v-model="scheckroomid" :loading="sloading" @focus='loadCheckRoom(item.excgroupid,item.ristypeid)' size='small' placeholder="请选择检查室">
+            <el-select v-model="item.scheckroomid" :loading="sloading" @focus='loadCheckRoom(item.excgroupid,item.ristypeid)' size='small' placeholder="请选择检查室">
               <el-option
                 v-for="item in checkrooms"
                 :key="item.checkroomid"
@@ -78,13 +78,24 @@ export default {
     },
     methods: {
       Queue(index){
+        if(!this.unqueuelist[index].scheckroomid){
+          this.$message({
+            type: 'error',
+            message: '请选择检查室!'
+          });
+          return
+        }
         //排队
         this.bloading = true
-        queueUp(store.state.patient.id,this.unqueuelist[index].regid,this.unqueuelist[index].adviceid,this.scheckroomid).then((data) => { 
+        queueUp(store.state.patient.id,this.unqueuelist[index].regid,this.unqueuelist[index].adviceid,this.unqueuelist[index].scheckroomid).then((data) => { 
           this.$message.success('排队成功!')
           this.initUnQueueList()
         }).catch(error => {
           console.error(error)
+          this.$message({
+            type: 'error',
+            message: error.msg
+          });
           this.bloading = false
         })
       },

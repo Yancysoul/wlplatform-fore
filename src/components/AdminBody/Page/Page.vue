@@ -4,6 +4,7 @@
       @current-change="changePage"
       style="text-align: center;margin-top: 20px"
       :pager-count="7"
+      :current-page="pagination.currentPage"
       layout="total, prev, pager, next, jumper"
       :total="parseInt(pagination.total)"
       v-show="pagination.total">
@@ -24,8 +25,8 @@ export default {
   methods: {
     changePage (val) {
       var curPage = `${val}`;
-      console.log(curPage)
-      this.$parent.queryListByPage(curPage)
+      this.$parent.queryListByPage ?  this.$parent.queryListByPage(curPage) : this.$emit('changePage',curPage);
+
     }
   }
 }

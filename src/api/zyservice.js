@@ -41,3 +41,14 @@ export function advancePayment (hosapplyid,userid,famt,paymethod) {
     }
   })
 }
+
+//取消预约
+export function cancelInHosp (regid) {
+  return request({
+    url: service_name+'/cancelInHosp',
+    method: 'POST',
+    data: {
+      regid:regid
+    }
+  })
+}

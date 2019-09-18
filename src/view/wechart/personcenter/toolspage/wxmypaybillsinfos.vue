@@ -1,8 +1,20 @@
 <template>
-  <h1>我的账单</h1>
+  <reginfospage @itemclick='ShowDetail' />
 </template>
 <script>
+import reginfospage from './components/reginfospage'
+
 export default {
+  
+  name:'wxregisterinfos',
+  methods:{
+    ShowDetail(regid,regtype){
+      this.$router.push({ path: '/wxmypaybillsdetail' , query: { regid: regid , regtype: regtype}});//跳转到该路由
+    }
+  },
+  components:{
+    reginfospage
+  }
   
 }
 </script>

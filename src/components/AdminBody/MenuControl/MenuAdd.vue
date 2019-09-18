@@ -59,18 +59,17 @@ export default {
     pagination: Object
   },
   created () {
-    this.getMenuLists();
+    // this.getMenuLists();
   },
   methods: {
     // 获取所有菜单列表
     getMenuLists () {
+      this.menuLists = [];
       for (let i = 1; i <= parseInt(this.pagination.pages); i++) {
         this.axios.post("/adminUserService/queryMenuPage", {currentPage: i}, {}).then(res => {
-          console.log(res)
           if (res && res.data.data.code === 200) {
             const res_menu = res.data.data;
             this.menuLists = this.menuLists.concat(res_menu.data.list);
-            console.log(this.menuLists)
           }
         })
       }
@@ -81,10 +80,8 @@ export default {
         if (valid) {
           this.menuAddPara.menuName = this.menuAddInfo.menuName;
           this.menuAddPara.url = (this.selMenu.url || "") + "/" + this.menuAddInfo.url;
-          this.menuAddPara.parentMenuId = this.selMenu.menuId;
-          // console.log(this.menuAddPara)
+          this.menuAddPara.parentMenuId = this.selMenu.menuId || 0;
           this.axios.post('/adminUserService/savaMenu', this.menuAddPara, {}).then(res => {
-            console.log(res);
             if (res && res.data.data.code === 200) {
               this.$message({
                 message: '新增菜单成功',

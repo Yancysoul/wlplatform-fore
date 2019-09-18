@@ -2,7 +2,7 @@
   <div>
     <!-- <pageback name='就诊人'/> -->
     <div v-loading='loading' class="patients">
-      <patienttab v-for="item in patients" :key="item.id" :patient="item" @change="patientchange"/>
+      <patienttab v-for="item in patients" :key="item.id" :patient="item" @change="patientchange" @delete="patientdelete" @update="patientupdate"/>
       <div class="nulltip" v-if="patients.length<=0">没有添加就诊人</div>
     </div>
     <div class="newpatientbt">
@@ -11,8 +11,8 @@
   </div>
 </template>
 <script>
-import pageback from '../../../../components/pageback'
-import {queryPatientListByUser,saveAsCurrentPatient,queryCurrentPatient} from '@/api/patient'
+import pageback from '@/components/pageback'
+import {queryPatientListByUser,saveAsCurrentPatient,queryCurrentPatient,deletePatient,synHisPatient} from '@/api/patient'
 import patienttab from './components/patienttab'
 import store from '@/store/index'
 
@@ -59,12 +59,41 @@ export default {
       })
       
     },
+    patientdelete(patient){
+      //删除就诊人
+      deletePatient(patient.id).then(data =>{
+        this.$message({
+          message: '删除成功!',
+          type: 'success',
+          center: true,
+          duration:1200
+        });
+        this.getPatients()
+      }).catch(error => {
+        console.error(error)
+      })
+    },
+    patientupdate(patient){
+      //同步HIS就诊人
+      synHisPatient(patient.id).then(data =>{
+        this.$message({
+          message: '同步成功!',
+          type: 'success',
+          center: true,
+          duration:1200
+        });
+        this.getPatients()
+      }).catch(error => {
+        console.error(error)
+      })
+    },
     newpatient(){
       this.$router.push({ path: '/wxnewpatient' });//跳转到该路由
     }
   },
   mounted(){
     this.getPatients()
+    this.setCurrentPatient()
   },
   components:{
     pageback,

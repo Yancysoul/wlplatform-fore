@@ -19,7 +19,7 @@
           </el-row>
           <el-row>
             <el-col :span="6">性别</el-col>
-            <el-col :span="18">{{zyinfo.sex}}<i class="el-icon-arrow-right"></i></el-col>
+            <el-col :span="18">{{zyinfo.sex == 1 ? "男" : "女"}}<i class="el-icon-arrow-right"></i></el-col>
           </el-row>
           <el-row>
             <el-col :span="6">年龄</el-col>
@@ -27,7 +27,7 @@
           </el-row>
           <el-row>
             <el-col :span="6">状态</el-col>
-            <el-col :span="18">{{zyinfo.state}}<i class="el-icon-arrow-right"></i></el-col>
+            <el-col :span="18">{{getRegState(zyinfo.state.toString())}}<i class="el-icon-arrow-right"></i></el-col>
           </el-row>
           <el-row>
             <el-col :span="6">住院科室</el-col>
@@ -98,9 +98,10 @@
 </template>
 <script>
 import store from '@/store/index'
-import {queryHospitalizationInfo} from '@/api/zyservice'
+import {queryHospitalizationInfo,cancelInHosp} from '@/api/zyservice'
 import {queryDepPage} from '@/api/group'
 import {inHospital} from '@/api/zyservice'
+import {queryCurrentCard} from '@/api/patient'
 
 export default {
   data(){
@@ -132,21 +133,56 @@ export default {
   },
   mounted() {
     this.initData()
+    
   },
   methods:{
     initData(){
       //获取在院状态
       queryHospitalizationInfo(store.state.userinfo.id).then((data) => {  //加载在院信息
-        this.zyState = true
+        this.zyState = data.state !=6 && data.state !=8 && data.state !=1 
         this.zyinfo = data
+        if(data.state == 1){
+          this.$confirm('存在未处理的预约记录,是否取消此记录?<br>'+"预约时间："+data.regdate+"<br>预约科室："+ data.reggroupname +"<br>联系人："+data.contact+"<br>联系电话："+data.contactmobile, '提示', {
+            confirmButtonText: '是',
+            cancelButtonText: '否',
+            dangerouslyUseHTMLString: true,
+            closeOnClickModal: false,
+            type: 'warning'
+          }).then(() => {
+
+            cancelInHosp(this.zyinfo.regid).then((data) => { 
+              this.$message({
+                type: 'success',
+                message: '取消成功!'
+              });
+            }).catch(error => {
+              console.error(error)
+              this.$message({
+                type: 'error',
+                message: '取消失败!'+error.msg
+              });
+              this.$router.push({ path: '/wxservices' });//跳转到该路由
+            })
+            
+          }).catch(() => {    
+            this.$router.push({ path: '/wxservices' });//跳转到该路由
+          });
+        }
       }).catch(error => {
         this.zyState = false
         console.error(error)
       })
       //获取住院科室
-      queryDepPage("",0).then((data) => { 
+      queryDepPage("",2).then((data) => { 
         this.zygroups = data
 
+      }).catch(error => {
+        console.error(error)
+      })
+
+      queryCurrentCard(store.state.userinfo.id).then((data) => {  //加载在院信息
+        this.selfinhospital.contacts = data.patientName
+        this.selfinhospital.contactstel = data.mobile
       }).catch(error => {
         console.error(error)
       })
@@ -169,7 +205,8 @@ export default {
             });
             
             this.loading = false
-            this.initData()
+            // this.initData()
+            this.$router.push({ path: '/wxservices' });//跳转到该路由
 
           }).catch(error => {
             this.loading = false
@@ -179,10 +216,39 @@ export default {
         }
       })
       
+    },
+    getRegState(code){
+        // 1:预约, 2:入院, 3:在院, 4:转科, 5:预出院, 6:结账,7:暂时离院,8:取消
+        switch(code){
+          case "1":
+            return "预约"
+          case "2":
+            return "入院"
+          case "3":
+            return "在院"
+          case "4":
+            return "转科"
+          case "5":
+            return "预出院"
+          case "6":
+            return "结账"
+          case "7":
+            return "暂时离院"
+          case "8":
+            return "取消"
+          default:
+            return "未知"
+      }
     }
   }
 }
 </script>
+<style>
+.el-message-box{
+  width:90%;
+}
+</style>
+
 <style scoped>
 .box-card{
   margin-bottom: 70px;
@@ -200,4 +266,5 @@ export default {
   font-size: 16px;
   text-align: right;
 }
+
 </style>

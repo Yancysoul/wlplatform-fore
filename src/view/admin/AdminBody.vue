@@ -2,19 +2,19 @@
   <el-row class="container">
     <el-col :span="24" class="header">
       <el-col class="logo">
-        {{logo}}
+        <router-link to="/home" style="color: #fff">{{logo}}</router-link>
       </el-col>
       <el-col class="userinfo">
         <el-dropdown trigger="hover">
-          <span class="el-dropdown-link userinfo-inner">{{UserName}}<img src="../../assets/image/docimg.jpg" alt=""></span>
+          <span class="el-dropdown-link userinfo-inner" style="font-size: 20px; font-weight: bold;">{{UserName}}<span style="font-size: 12px; vertical-align: bottom;">（{{roleName}}）</span><img src="../../assets/image/docimg.jpg" alt=""></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="editPassword">修改密码</el-dropdown-item>
 						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
-          <el-dialog title="修改密码" :visible.sync="dialogPassVisible">
+          <el-dialog title="修改密码" :visible.sync="dialogPassVisible" width="30%">
             <el-form :model="passwordForm">
               <el-form-item label="旧密码" :label-width="formLabelWidth">
-                <el-input v-model="passwordForm.oldPassword" autocomplete="off" placeholder="请输入旧密码"></el-input>
+                <el-input v-model="passwordForm.prePassword" autocomplete="off" placeholder="请输入旧密码"></el-input>
               </el-form-item>
               <el-form-item label="新密码" :label-width="formLabelWidth">
                 <el-input v-model="passwordForm.newPassword" autocomplete="off" placeholder="请输入新密码"></el-input>
@@ -22,7 +22,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="dialogPassVisible = false">取 消</el-button>
-              <el-button type="primary" @click="dialogPassVisible = false">确 定</el-button>
+              <el-button type="primary" @click="sureEditPassword">确 定</el-button>
             </div>
           </el-dialog>
         </el-dropdown>
@@ -30,23 +30,25 @@
     </el-col>
     <el-col :span="24" class="main">
       <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
-				<!--导航菜单-->
-        <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect" :collapse="isCollapse" unique-opened router>
-          <el-submenu v-for="(menu, index) in menuList" :key="index" :index="index + ''">
-            <template slot="title">
-              <!-- <i :class="menu.menuIcon"></i> -->
-              <span>{{menu.menuName}}</span>
-            </template>
-            <el-menu-item v-for="(cMenu, cIndex) in menu.menuList" :key="cIndex" :index="cMenu.url">
-              {{cMenu.menuName}}
-            </el-menu-item>
-          </el-submenu>
-        </el-menu>
+        <el-scrollbar style="height: 100%;">
+          <!--导航菜单-->
+          <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect" :collapse="isCollapse" router>
+            <el-submenu v-for="(menu, index) in menuList" :key="index" :index="index + ''">
+              <template slot="title">
+                <!-- <i :class="menu.menuIcon"></i> -->
+                <span>{{menu.menuName}}</span>
+              </template>
+              <el-menu-item v-for="(cMenu, cIndex) in menu.menuList" :key="cIndex" :index="cMenu.url">
+                {{cMenu.menuName}}
+              </el-menu-item>
+            </el-submenu>
+          </el-menu>
+        </el-scrollbar>
 			</aside>
       <section class="content-container">
 				<div class="grid-content bg-purple-light">
 					<el-col :span="24" class="breadcrumb-container">
-						<strong class="title">{{$route.name}}</strong>
+            <el-divider content-position="center"><span style="font-size: 20px; font-weight: bold;">{{$route.meta.title}}</span></el-divider>
 					</el-col>
 					<el-col :span="24" class="content-wrapper">
 						<transition name="fade" mode="out-in">
@@ -67,21 +69,24 @@ export default {
   data () {
     return {
       dialogPassVisible: false,
-      logo: "LOGO",
-      UserName: '张三',
+      logo: "医院后台管理",
+      UserName: '',
+      roleName: '',
       UserAvatar: '',
       collapsed:false,
       isCollapse: false,
       menuList: [],
       passwordForm: {
-        oldPassword: '',
+        prePassword: '',
         newPassword: ''
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '80px',
+      isMenu: {}
     }
   },
   created () {
-    this.UserName = JSON.parse(localStorage.getItem("user")).userName;
+    this.UserName = JSON.parse(localStorage.getItem("user")).user.userName;
+    this.roleName = JSON.parse(localStorage.getItem("user")).user.roleName;
     this.getAllMenu()
     bus.$on('send:menu', (msg) => {
       if (msg) {
@@ -98,9 +103,20 @@ export default {
           const resoult = res.data.data;
           if (resoult.code === 200) {
             this.menuList = resoult.data.menuList;
+            this.curUserMenu (this.menuList)
+            this.$store.dispatch('GetUserMenu', this.isMenu);
           }
         }
       })
+    },
+    // 筛选当前用户可用菜单
+    curUserMenu (menuList) {
+      for (let menu of menuList) {
+        this.isMenu[menu.url] = menu.hasMenue;
+        if (menu.menuList) {
+          this.curUserMenu(menu.menuList)
+        }
+      }
     },
     // 退出登录
     logout () {
@@ -133,7 +149,28 @@ export default {
     },
     // 修改密码
     editPassword () {
+      this.passwordForm = {}
       this.dialogPassVisible = true;
+    },
+    // 确认修改排班
+    sureEditPassword () {
+      console.log(this.passwordForm)
+      this.axios.post("/adminUserService/changePassword", this.passwordForm, {}).then(res => {
+        if (res) {
+          if (res.data.data.code === 200) {
+            this.$message({
+              message: '密码修改成功',
+              type: 'success'
+            })
+            this.dialogPassVisible = false;
+          } else if (res.data.data.code === -1) {
+            this.$message({
+              message: '原密码错误',
+              type: 'warning'
+            })
+          }
+        }
+      })
     }
   }
 }
@@ -164,7 +201,7 @@ $color-primary: #20a0ff;//#18c79c
     .userinfo {
       margin-left: auto;
       display: flex;
-      width: 120px;
+      width: 230px;
       .userinfo-inner {
         cursor: pointer;
         color: #fff;

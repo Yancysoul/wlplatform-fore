@@ -2,20 +2,20 @@
 <div class="content" @click="click()">
   <el-row >
       <el-col :span="8" style="text-align:center">
-        <el-image class="headImage" :src="headimgsrc" fit="fill">
+        <el-image class="headImage" :src="headimgsrc ? headimgsrc : defualtheadimg " fit="fill">
 
         </el-image>
       </el-col>
       <el-col :span="16" style="padding-top:7px;">
         <span class="name">{{nikename}}</span><br>
         <span class="patient">
-          <span v-if="patient"> 
+          <span v-if="patient.id != undefined"> 
             <i class="el-icon-user-solid" style="color:#00A98A;"></i>
             <i :class="patient.sex == 1 ? maniconstyle : womaniconstyle"></i> 
             {{patient.name}} 
           </span>
           <span v-else>
-            未添加就诊人
+            点击添加就诊人
           </span>
           <span class="yjt"><i class="el-icon-arrow-right"></i></span>
         </span>
@@ -38,6 +38,7 @@ export default {
         patient: store.state.patient,
         maniconstyle: 'el-icon-female manicon',
         womaniconstyle: 'el-icon-male womanicon',
+        defualtheadimg: require('@/assets/image/user1.jpg')
       }
     },
     methods:{

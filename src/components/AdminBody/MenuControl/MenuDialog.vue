@@ -8,7 +8,7 @@
       <el-form-item label="菜单编号">
         <el-input v-model="menuInfo.menuId" :disabled="disabled"></el-input>
       </el-form-item>
-      <el-form-item label="角色名">
+      <el-form-item label="菜单名称">
         <el-input v-model="menuInfo.menuName"></el-input>
       </el-form-item>
       <el-form-item label="菜单URL">

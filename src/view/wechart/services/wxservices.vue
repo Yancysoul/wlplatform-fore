@@ -53,6 +53,7 @@ import {queryQueueList} from '@/api/queue'
 import {queryHealthForumPage} from '@/api/health'
 
 export default {
+  name:'wxservices',
   data(){
     return{
       menus1:[

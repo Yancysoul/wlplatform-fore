@@ -18,6 +18,10 @@
           <el-col :span="18">{{zyinfo.sex==1 ? '男' : '女'}}<i class="el-icon-arrow-right"></i></el-col>
         </el-row>
         <el-row>
+          <el-col :span="6">年龄</el-col>
+          <el-col :span="18">{{zyinfo.age}}<i class="el-icon-arrow-right"></i></el-col>
+        </el-row>
+        <el-row>
           <el-col :span="6">住院科室</el-col>
           <el-col :span="18">{{zyinfo.departmentName}}<i class="el-icon-arrow-right"></i></el-col>
         </el-row>
@@ -79,9 +83,9 @@ export default {
     initData(){
       //获取在院信息
       queryHospitalizationInfo(store.state.userinfo.id).then((data) => {  //加载在院信息
-        this.zyState = true
+        this.zyState = data.state !=6 && data.state !=8 && data.state !=1 
         this.zyinfo = data
-        queryDepEdu(this.zyinfo.areaid).then((data) => {  //加载住院宣教
+        queryDepEdu(this.zyinfo.zywardid).then((data) => {  //加载住院宣教
           this.zyedu = data
         }).catch(error => {
           console.error(error)

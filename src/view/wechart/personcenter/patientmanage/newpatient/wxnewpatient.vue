@@ -57,10 +57,7 @@
 </template>
 <script>
 import pageback from '@/components/pageback'
-import {sendCheckCodeSms} from '@/api/patient'
-import {sendCheckCodeSmsFromCard} from '@/api/patient'
-import {savePatient} from '@/api/patient'
-import {savePatientWithCard} from '@/api/patient'
+import {sendCheckCodeSms,sendCheckCodeSmsFromCard,savePatient,savePatientWithCard,queryCurrentPatient} from '@/api/patient'
 import store from '@/store/index'
 import Calendar from 'vue2-datepick';
 
@@ -237,6 +234,7 @@ export default {
             }else{
               savePatient(this.newpatient,store.state.userinfo.id,this.codekey).then(data =>{
                 this.loading.submit = false
+                
                 this.$router.push({ path: '/wxpatientmanage' });//跳转到该路由
                 this.$message({
                   message: '添加成功',

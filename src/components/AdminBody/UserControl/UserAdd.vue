@@ -53,6 +53,7 @@ export default {
                   message: '用户增加成功',
                   type: 'success'
                 })
+                this.$refs[formName].resetFields();
                 this.$parent.updateUsers();
               }
             }

@@ -28,31 +28,32 @@
       <el-table-column
         prop="userName"
         label="用户名"
-        min-width="80">
+        min-width="70">
       </el-table-column>
       <el-table-column
         prop="roleId"
         label="角色ID"
-        min-width="100">
+        min-width="120">
       </el-table-column>
       <el-table-column
         prop="roleName"
         label="角色名称"
-        min-width="100">
+        min-width="70">
       </el-table-column>
       <el-table-column
         prop="createTime"
         label="创建时间"
-        min-width="160">
+        min-width="90">
       </el-table-column>
       <el-table-column
         prop="updateTime"
         label="更新时间"
-        min-width="160">
+        min-width="90">
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="250">
 				<template slot-scope="scope">
 					<el-button size="small" type="success" @click="editDetails(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="small" type="info" @click="resetPassword(scope.$index, scope.row)">重置密码</el-button>
           <el-button size="small" type="danger" @click="delDetails(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
@@ -109,7 +110,7 @@
         this.loading = true;
         this.axios.post("/adminUserService/queryUserPage", this.queryInfo, {}).then((res) => {
           if (res) {
-            console.log(res)
+            // console.log(res)
             const result = res.data.data;
             if (result.code === 200) {
               this.userLists = result.data.list;
@@ -141,6 +142,7 @@
         this.dialogInfo.roleId = row.roleId;
         this.$refs.mychild.setDiaInfo(this.dialogInfo)
       },
+      // 删除用户
       delDetails (index, row) {
         this.$confirm(`将永远删除用户'${row.userName}'，是否继续？`, '提示', {
           confirmButtonText: '确定',
@@ -159,6 +161,28 @@
         }).catch(() => {
           this.$message({
             message: '已取消删除！',
+            type: 'info'
+          })
+        })
+      },
+      // 重置密码
+      resetPassword (index, row) {
+        this.$confirm(`确定重置用户'${row.userName}'的密码？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.axios.post("/adminUserService/resetPassword", {userId: row.userId}, {}).then(res => {
+            if (res && res.data.data.code === 200) {
+              this.$message({
+                message: '重置密码成功',
+                type: 'success'
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            message: '已取消重置密码！',
             type: 'info'
           })
         })

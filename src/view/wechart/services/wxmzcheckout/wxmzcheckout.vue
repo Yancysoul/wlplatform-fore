@@ -53,7 +53,8 @@ import {queryOutPatientBill} from '@/api/mzservice'
 import {outPatientBillPayment} from '@/api/mzservice'
 import {cardBalance} from '@/api/card'
 import {jsSDK} from '@/api/wxjspay'
-
+import {accAdd,toDecimal2} from '@/utils/floatmath'
+import {isWeiXin} from '@/utils/request'
 
 
 export default {
@@ -70,102 +71,13 @@ export default {
       patient:store.state.patient,
       loading:false,
       reginfos:[
-        {
-          regid:'1',
-          group:'小儿科',
-          doc:'张建斌',
-          date:'12:26',
-          billinfos:[
-          {
-            billid:'1',
-            billno:'10001',
-            state:false,
-            famt:520.00,
-            feeinfos:[
-              {
-                feeid:'1',
-                name:'阿莫西林胶囊',
-                feetype:1,
-                count:'2',
-                unit:'盒',
-                famt:400.00
-              },
-              {
-                feeid:'2',
-                name:'磁共振平扫',
-                feetype:5,
-                count:'1',
-                unit:'次',
-                famt:120.00
-              }
-            ]
-          },
-          {
-            billid:'2',
-            billno:'10002',
-            state:false,
-            famt:28.00,
-            feeinfos:[
-              {
-                feeid:'1',
-                name:'依达拉奉针',
-                feetype:1,
-                count:'1',
-                unit:'支',
-                famt:25.00
-              },
-              {
-                feeid:'2',
-                name:'静脉注射',
-                feetype:5,
-                count:'1',
-                unit:'次',
-                famt:3.00
-              }
-            ]
-          }
-        ]},
-        {
-          regid:'2',
-          group:'门诊内科',
-          doc:'马同军',
-          date:'14:31',
-          billinfos:[
-          {
-            billid:'1',
-            billno:'20001',
-            state:false,
-            famt:1540.00,
-            feeinfos:[
-              {
-                feeid:'1',
-                name:'光子CT',
-                feetype:5,
-                count:'1',
-                unit:'次',
-                famt:1400.00
-              },
-              {
-                feeid:'2',
-                name:'血常规',
-                feetype:6,
-                count:'1',
-                unit:'次',
-                famt:60.00
-              },
-              {
-                feeid:'3',
-                name:'彩色多普勒超声',
-                feetype:5,
-                count:'1',
-                unit:'次',
-                famt:80.00
-              }
-            ]
-          }
-        ]}
       ]
     };
+  },
+  watch: {
+    totalfamt(val) {
+      this.totalfamt = toDecimal2(val);
+    }
   },
   mounted(){
     this.loadingdata()
@@ -216,7 +128,7 @@ export default {
             }
           }) 
             reginfo.feebillinfos.forEach(billinfo => {
-              this.totalfamt += billinfo.state ? billinfo.famt-0 : 0.00
+              this.totalfamt = accAdd(this.totalfamt,billinfo.state ? billinfo.famt-0 : 0.00)
            })
         }
       });
@@ -230,7 +142,9 @@ export default {
           reginfo.feebillinfos.forEach(item => {
             if(item.billid == billinfo.billid){
               item.state = !item.state
-              this.totalfamt += item.state ? item.famt-0 : -item.famt-0
+              console.log(item.famt)
+              this.totalfamt = accAdd(this.totalfamt,item.state ? item.famt-0 : -item.famt-0) 
+              console.log("total:"+ this.totalfamt)
             }
             if(item.state){
               chosecount += 1
@@ -260,8 +174,12 @@ export default {
       }
     },
     CheckOut(){  //结算
-      this.loading = true
       let paytype = this.$refs.payment.isYktPay ? 2 : 1
+      if(paytype === 1 & !isWeiXin()){
+        this.$message.error('暂不支持在线支付!');
+        return
+      }
+      this.loading = true
       let billids = []
       this.feedata.registerinfos.forEach(reginfo => {
         if(reginfo.regid == this.activeName){
@@ -308,10 +226,14 @@ export default {
       })
       
     }
+    
   }
 }
 </script>
 <style scoped>
+.box-card{
+  margin-bottom: 120px;
+}
 .reginfos{
   margin-top: 20px;
 }
@@ -326,9 +248,10 @@ export default {
 .checkBt{
   width: 100%;
   text-align: center;
-  position: fixed;
+  position:fixed;
   bottom: 60px;
   left: 0;
+  background-color: #F2F6FC;
 }
 .content{
   display: inline-block;

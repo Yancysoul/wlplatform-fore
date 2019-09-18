@@ -42,9 +42,10 @@ export default {
     booking(){
       this.loading = true
 
-      saveRegister(store.state.userinfo.id,store.state.patient.id,this.bookingdata.id,0,2).then((data) => {  //保存挂号
+      saveRegister(store.state.userinfo.id,store.state.patient.id,this.bookingdata.id,'1','2').then((data) => {  //保存挂号
         this.$message.success('预约成功!');
         this.loading = false
+        this.$router.back(-1)
       }).catch(error => {
         this.loading = false
         console.error(error)

@@ -14,7 +14,7 @@
         </div>
 
         <div class="main6">
-          <span>{{cardinfo.balance}}</span><br>
+          <span>{{thistoDecimal2(cardinfo.balance)}}</span><br>
           <span>一卡通余额（元）</span>
         </div>
 
@@ -33,6 +33,7 @@
 <script>
 import store from '@/store/index'
 import {queryCurrentCard,queryCardQrCode} from '@/api/patient'
+import {toDecimal2} from '@/utils/floatmath'
 
 export default {
   data(){
@@ -56,6 +57,9 @@ export default {
       }).catch(error => {
         console.error(error)
       })
+    },
+    thistoDecimal2(val){
+      return toDecimal2(val)
     }
   },
   mounted(){

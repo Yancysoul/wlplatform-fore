@@ -44,5 +44,7 @@ export default {
 .content{
   margin-left:15px;
   border-bottom:1px solid #F2F6FC;
+  font-size: 13px;
+  padding: 5px;
 }
 </style>

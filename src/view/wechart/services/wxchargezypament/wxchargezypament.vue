@@ -19,12 +19,20 @@
           <el-col :span="18">{{zyinfo.sex==1 ? '男' : '女'}}<i class="el-icon-arrow-right"></i></el-col>
         </el-row>
         <el-row>
+          <el-col :span="6">年龄</el-col>
+          <el-col :span="18">{{zyinfo.age}}<i class="el-icon-arrow-right"></i></el-col>
+        </el-row>
+        <el-row>
           <el-col :span="6">押金总额</el-col>
           <el-col :span="18">{{zyinfo.deposit}}<i class="el-icon-arrow-right"></i></el-col>
         </el-row>
         <el-row>
           <el-col :span="6">住院总消费</el-col>
           <el-col :span="18">{{zyinfo.feeamt}}<i class="el-icon-arrow-right"></i></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">押金余额</el-col>
+          <el-col :span="18">{{zyinfo.balance}}<i class="el-icon-arrow-right"></i></el-col>
         </el-row>
         <el-row>
           <el-col :span="6">住院科室</el-col>
@@ -71,6 +79,7 @@ import {queryHospitalizationInfo} from '@/api/zyservice'
 import {advancePayment} from '@/api/zyservice'
 import {cardBalance} from '@/api/card'
 import {jsSDK} from '@/api/wxjspay'
+import {isWeiXin} from '@/utils/request'
 
 export default {
   data(){
@@ -96,7 +105,7 @@ export default {
     initData(){
       //获取在院信息
       queryHospitalizationInfo(store.state.userinfo.id).then((data) => {  //加载在院信息
-        this.zyState = true
+        this.zyState = data.state !=6 && data.state !=8 && data.state !=1 
         this.zyinfo = data
       }).catch(error => {
         this.zyState = false
@@ -127,8 +136,13 @@ export default {
       }
     },
     CheckOut(){
-      this.loading = true
       let paytype = this.$refs.payment.isYktPay ? 2 : 1
+      if(paytype === 1 & !isWeiXin()){
+        this.$message.error('暂不支持在线支付!');
+        return
+      }
+      this.loading = true
+      
       //住院交预交金
       advancePayment(this.zyinfo.id,store.state.userinfo.id,this.amt,paytype).then((data) => {
         if(paytype === 1){

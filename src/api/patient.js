@@ -38,8 +38,9 @@ export function savePatient (patient,userid,codekey) {
       mobile:patient.mobile,
       address:patient.address,
       checkCode: patient.validcode,
-      checkCodeKey: codekey
-
+      checkCodeKey: codekey,
+      currentStatus:1
+ 
     }
   })
 }
@@ -56,7 +57,7 @@ export function savePatientWithCard (patient,userid,codekey) {
       certNo:patient.icno,
       checkCode: patient.validcode,
       checkCodeKey: codekey,
-      currentStatus:0
+      currentStatus:1
 
     }
   })
@@ -117,6 +118,28 @@ export function queryCardQrCode (userid) {
     method: 'POST',
     data: {
       userId:userid
+    }
+  })
+}
+
+//删除就诊人
+export function deletePatient (id) {
+  return request({
+    url: '/api/patientService/deletePatient',
+    method: 'POST',
+    data: {
+      id:id
+    }
+  })
+}
+
+//同步HIS就诊人信息
+export function synHisPatient (id) {
+  return request({
+    url: '/api/patientService/synHisPatient',
+    method: 'POST',
+    data: {
+      id:id
     }
   })
 }

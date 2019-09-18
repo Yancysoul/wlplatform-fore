@@ -32,6 +32,7 @@ import store from '@/store/index'
 import {cardInvest} from '@/api/card'
 import payment from '@/components/payment'
 import {jsSDK} from '@/api/wxjspay'
+import {isWeiXin} from '@/utils/request'
 
 
 export default {
@@ -61,6 +62,11 @@ export default {
       }
     },
     ChargePay(){
+      
+      if(!isWeiXin()){
+        this.$message.error('暂不支持在线支付!');
+        return
+      }
       this.loading = true
       //一卡通余额充值
       cardInvest(store.state.userinfo.id,store.state.patient.id,this.amt).then((data) => {

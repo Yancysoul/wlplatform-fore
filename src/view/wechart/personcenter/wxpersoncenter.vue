@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin-bottom: 70px;">
     <personhead/>
     <yktcard/>
     <tools/>
@@ -13,6 +13,7 @@ import yktcard from './components/yktcard'
 import tools from './components/tools'
 
 export default {
+  name:'wxpersoncenter',
   components: {
       personhead,
       yktcard,

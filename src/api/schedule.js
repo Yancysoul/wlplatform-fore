@@ -15,10 +15,10 @@ export function queryOnlineList () {
 //查询排版信息
 export function queryRegisterSheduleList (groupid,docid,date) {
   return request({
-    url: service_name+'/queryRegisterSheduleList',
+    url: service_name+'/queryRegisterScheduleList',
     method: 'POST',
     data: {
-      sheduledate:date,
+      scheduleDate:date,
       derpartmentId:groupid,
       doctorId:docid
     }

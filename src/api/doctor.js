@@ -14,6 +14,19 @@ export function queryDoctorPage (spflag,groupid) {
   })
 }
 
+//医生列表查询
+export function queryDoctorNameList (groupid) {
+  return request({
+    url: service_name+'/queryDoctorList',
+    method: 'POST',
+    data: {
+      departmentId:groupid
+    }
+  })
+}
+
+
+
 //查询有挂号医师
 export function queryScheduleDoctorList (groupid) {
   return request({
